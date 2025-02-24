@@ -1,40 +1,51 @@
-import streamlit as st
+import os
+import subprocess
+import time
+import chromedriver_autoinstaller
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-import chromedriver_autoinstaller
+from selenium.webdriver.common.by import By
+import streamlit as st
 
-# Automatically install the correct version of ChromeDriver
-import os
-import chromedriver_autoinstaller
+# Install Google Chrome manually
+def install_chrome():
+    if not os.path.exists("/usr/bin/google-chrome"):
+        subprocess.run(
+            "wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && "
+            "apt-get update && "
+            "apt-get install -y ./google-chrome-stable_current_amd64.deb",
+            shell=True, check=True
+        )
 
-# Manually set Chrome path for Streamlit Cloud
-chrome_path = "/usr/bin/google-chrome"
-os.environ["CHROME_BIN"] = chrome_path
+# Run Chrome installation
+install_chrome()
 
-# Install ChromeDriver
-chromedriver_autoinstaller.install()
+# Set Chrome binary path
+os.environ["CHROME_BIN"] = "/usr/bin/google-chrome"
 
+# Install and get the path to ChromeDriver
+chromedriver_path = chromedriver_autoinstaller.install()
 
-# Set up headless Chrome
-chrome_options = Options()
-chrome_options.add_argument("--headless")  # Run without UI
-chrome_options.add_argument("--disable-gpu")
+# Configure Selenium WebDriver
+chrome_options = webdriver.ChromeOptions()
+chrome_options.binary_location = os.environ["CHROME_BIN"]
+chrome_options.add_argument("--headless")  # Run in headless mode
 chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
 
-def scrape_website(url):
-    service = Service()  # No need to specify executable_path
-    driver = webdriver.Chrome(service=service, options=chrome_options)
-    driver.get(url)
-    title = driver.title
-    driver.quit()
-    return title
+service = Service(chromedriver_path)
+driver = webdriver.Chrome(service=service, options=chrome_options)
 
-st.title("Selenium on Streamlit Cloud")
-url = st.text_input("Enter website URL")
-if st.button("Scrape"):
-    if url:
-        result = scrape_website(url)
-        st.success(f"Page Title: {result}")
-    else:
-        st.warning("Please enter a valid URL")
+# Streamlit UI
+st.title("Selenium Test on Streamlit")
+
+st.write("Opening Google Homepage...")
+driver.get("https://www.google.com")
+time.sleep(2)  # Allow page to load
+
+# Get the title of the page
+title = driver.title
+st.write(f"Page title: {title}")
+
+# Close driver
+driver.quit()
