@@ -5,7 +5,16 @@ from selenium.webdriver.chrome.options import Options
 import chromedriver_autoinstaller
 
 # Automatically install the correct version of ChromeDriver
+import os
+import chromedriver_autoinstaller
+
+# Manually set Chrome path for Streamlit Cloud
+chrome_path = "/usr/bin/google-chrome"
+os.environ["CHROME_BIN"] = chrome_path
+
+# Install ChromeDriver
 chromedriver_autoinstaller.install()
+
 
 # Set up headless Chrome
 chrome_options = Options()

@@ -1,2 +1,6 @@
+wget
+unzip
+curl
+google-chrome-stable
 
 
