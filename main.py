@@ -1,19 +1,19 @@
 import time
+import streamlit as st
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
-import streamlit as st
 
-# Configure Selenium to use Firefox in headless mode
+# Configure Firefox options
 firefox_options = Options()
-firefox_options.add_argument("--headless")  # Run in headless mode
+firefox_options.add_argument("--headless")  # Run without UI
 
-# Start Firefox WebDriver
-service = Service("/usr/bin/geckodriver")  # Geckodriver is pre-installed in Streamlit
+# Use Geckodriver (already available on Streamlit Cloud)
+service = Service("/usr/bin/geckodriver")
 driver = webdriver.Firefox(service=service, options=firefox_options)
 
 # Streamlit UI
-st.title("Selenium Test on Streamlit with Firefox")
+st.title("Selenium Test on Streamlit (Using Firefox)")
 
 st.write("Opening Google Homepage...")
 driver.get("https://www.google.com")
